@@ -13,7 +13,7 @@
 		"sources": "https://github.com/velnias75/ReAnimator"
 	},
 	"license": "GPL-3.0-or-later",
-	"icon": "assets/panda_crossing/panda_crossing.png",
+	"icon": "assets/reanimator/reanimator.png",
 	"environment": "client",
 	"entrypoints": {
 		"client": [
