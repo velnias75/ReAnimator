@@ -29,7 +29,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 
@@ -56,14 +58,36 @@ public final class PosCommand implements Command<FabricClientCommandSource> {
 		case MISS:
 			break;
 		case ENTITY:
+			blockPos = new BlockPos(((EntityHitResult) hit).getPos());
 			break;
 		case BLOCK:
 			blockPos = ((BlockHitResult) hit).getBlockPos();
 			break;
 		}
 
-		rCtx.setPosition(position, blockPos);
+		if (blockPos != null) {
+			rCtx.setPosition(position, blockPos);
+			ctx.getSource().sendFeedback(Text.literal(
+					positionText() + " set to " + blockPos.getX() + ", " + blockPos.getY() + ", " + blockPos.getZ()));
+		} else {
+			ctx.getSource().sendError(Text.literal("Could not determine any block at crosshair position"));
+		}
 
 		return Command.SINGLE_SUCCESS;
+	}
+
+	private String positionText() {
+
+		switch (position) {
+		case SOURCE_POS1:
+			return "source position 1";
+		case SOURCE_POS2:
+			return "source position 2";
+		case TARGET_POS1:
+		case TARGET_POS2:
+			return "target position";
+		default:
+			throw new IllegalStateException("no position text for this position");
+		}
 	}
 }

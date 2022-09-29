@@ -217,7 +217,7 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		case TARGET_POS2:
 			return targetPos2;
 		default:
-			return null;
+			throw new IllegalStateException("invalid position");
 		}
 	}
 }
