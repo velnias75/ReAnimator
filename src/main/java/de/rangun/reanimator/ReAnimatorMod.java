@@ -36,6 +36,37 @@ import net.minecraft.util.math.Vec3d;
 @Environment(EnvType.CLIENT)
 public final class ReAnimatorMod implements ClientModInitializer {
 
+	private static enum Color {
+
+		RED(255, 0, 0, 255), BLUE(0, 0, 255, 255);
+
+		private final int r, g, b, a;
+
+		Color(int r, int g, int b, int a) {
+
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.a = a;
+		}
+
+		public int red() {
+			return r;
+		}
+
+		public int green() {
+			return g;
+		}
+
+		public int blue() {
+			return b;
+		}
+
+		public int alpha() {
+			return a;
+		}
+	};
+
 	@Override
 	public void onInitializeClient() {
 
@@ -43,7 +74,7 @@ public final class ReAnimatorMod implements ClientModInitializer {
 
 			final Vec3d pos1 = new Vec3d(6d, -1d, -8d);
 			final Vec3d pos2 = new Vec3d(9d, 4d, -11d);
-			
+
 			final Vec3d pos3 = new Vec3d(1d, 1d, -8d);
 			final Vec3d pos4 = new Vec3d(0d, 0d, -7d);
 
@@ -54,17 +85,16 @@ public final class ReAnimatorMod implements ClientModInitializer {
 
 			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-			renderCube(ctx, pos1, pos2, 255, 0, 0, 255);
-			renderCube(ctx, pos3, pos4, 0, 0, 255, 255);
+			renderCube(ctx, pos1, pos2, Color.RED);
+			renderCube(ctx, pos3, pos4, Color.BLUE);
 
-			RenderSystem.depthMask(true);
 			RenderSystem.enableBlend();
 			RenderSystem.enableTexture();
+			RenderSystem.depthMask(true);
 		});
 	}
 
-	private void renderCube(final WorldRenderContext ctx, final Vec3d pos1, final Vec3d pos2, int red, int green,
-			int blue, int alpha) {
+	private void renderCube(final WorldRenderContext ctx, final Vec3d pos1, final Vec3d pos2, Color color) {
 
 		final Vec3d npos1 = pos1.getZ() < pos2.getZ() ? pos2 : pos1;
 		final Vec3d npos2 = pos1.getZ() < pos2.getZ() ? pos1 : pos2;
@@ -105,7 +135,8 @@ public final class ReAnimatorMod implements ClientModInitializer {
 
 			final Vec3d cv = v.subtract(camera);
 
-			buffer.vertex(cv.getX(), cv.getY(), cv.getZ()).color(red, green, blue, alpha).next();
+			buffer.vertex(cv.getX(), cv.getY(), cv.getZ())
+					.color(color.red(), color.green(), color.blue(), color.alpha()).next();
 		}
 
 		tessellator.draw();
