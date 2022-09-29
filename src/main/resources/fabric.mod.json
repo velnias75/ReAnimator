@@ -3,7 +3,7 @@
 	"id": "reanimator",
 	"version": "@version@",
 	"name": "ReAnimator",
-	"description": "tbw",
+	"description": "Pre-build your animation models and turn them into command blocks.",
 	"authors": [
 		"Velnias75"
 	],
