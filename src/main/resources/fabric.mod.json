@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "reanimator",
+	"version": "@version@",
+	"name": "ReAnimator",
+	"description": "tbw",
+	"authors": [
+		"Velnias75"
+	],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/pandacrossing",
+		"issues": "https://github.com/velnias75/PandaCrossing/issues",
+		"sources": "https://github.com/velnias75/PandaCrossing"
+	},
+	"license": "GPL-3.0-or-later",
+	"icon": "assets/panda_crossing/panda_crossing.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"de.rangun.reanimator.ReAnimatorMod"
+		],
+		"modmenu": [
+			"de.rangun.reanimator.config.ModMenu"
+		]
+	},
+	"mixins": [
+	],
+	"depends": {
+		"fabricloader": ">=0.14.0",
+		"fabric": "*",
+		"minecraft": ">=1.19.2"
+	},
+	"recommends": {
+		"cloth-config2": ">=8.0.75"
+	},
+	"suggests": {
+		"modmenu": ">=4.0.6"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/tkX9BcwCCS"
+			}
+		}
+	}
+}
