@@ -19,11 +19,16 @@
 
 package de.rangun.reanimator;
 
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import de.rangun.reanimator.commands.PosCommand;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.render.BufferBuilder;
@@ -31,10 +36,11 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 @Environment(EnvType.CLIENT)
-public final class ReAnimatorMod implements ClientModInitializer {
+public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext {
 
 	private static enum Color {
 
@@ -67,16 +73,16 @@ public final class ReAnimatorMod implements ClientModInitializer {
 		}
 	};
 
+	private BlockPos sourcePos1 = null;
+	private BlockPos sourcePos2 = null;
+
+	private BlockPos targetPos1 = null;
+	private BlockPos targetPos2 = null;
+
 	@Override
 	public void onInitializeClient() {
 
 		WorldRenderEvents.BEFORE_DEBUG_RENDER.register((ctx) -> {
-
-			final Vec3d pos1 = new Vec3d(6d, -1d, -8d);
-			final Vec3d pos2 = new Vec3d(9d, 4d, -11d);
-
-			final Vec3d pos3 = new Vec3d(1d, 1d, -8d);
-			final Vec3d pos4 = new Vec3d(0d, 0d, -7d);
 
 			RenderSystem.lineWidth(1.0f);
 			RenderSystem.depthMask(false);
@@ -85,19 +91,45 @@ public final class ReAnimatorMod implements ClientModInitializer {
 
 			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-			renderCube(ctx, pos1, pos2, Color.RED);
-			renderCube(ctx, pos3, pos4, Color.BLUE);
+			renderCube(ctx, sourcePos1, sourcePos2, Color.RED);
+			renderCube(ctx, targetPos1, targetPos2, Color.BLUE);
 
 			RenderSystem.enableBlend();
 			RenderSystem.enableTexture();
 			RenderSystem.depthMask(true);
 		});
+
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+			sourcePos1 = null;
+			sourcePos2 = null;
+			targetPos1 = null;
+			targetPos2 = null;
+		});
+
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			dispatcher.register(literal("spos1").executes(new PosCommand(Position.SOURCE_POS1, this)));
+		});
+
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			dispatcher.register(literal("spos2").executes(new PosCommand(Position.SOURCE_POS2, this)));
+		});
+
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			dispatcher.register(literal("tpos").executes(new PosCommand(Position.TARGET_POS1, this)));
+		});
 	}
 
-	private void renderCube(final WorldRenderContext ctx, final Vec3d pos1, final Vec3d pos2, Color color) {
+	private void renderCube(final WorldRenderContext ctx, final BlockPos pos1, final BlockPos pos2, Color color) {
 
-		final Vec3d npos1 = pos1.getZ() < pos2.getZ() ? pos2 : pos1;
-		final Vec3d npos2 = pos1.getZ() < pos2.getZ() ? pos1 : pos2;
+		if (pos1 == null || pos2 == null) {
+			return;
+		}
+
+		final Vec3d nPos = new Vec3d(Math.min(pos1.getX(), pos2.getX()) - 1d, Math.min(pos1.getY(), pos2.getY()) - 1d,
+				Math.min(pos1.getZ(), pos2.getZ()));
+
+		final Vec3d sPos = new Vec3d(Math.max(pos1.getX(), pos2.getX()) + 1d, Math.max(pos1.getY(), pos2.getY()) + 1d,
+				Math.max(pos1.getZ(), pos2.getZ()));
 
 		final Vec3d camera = ctx.camera().getPos();
 
@@ -106,30 +138,28 @@ public final class ReAnimatorMod implements ClientModInitializer {
 
 		buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-		final Vec3d[] vertices = new Vec3d[] { new Vec3d(npos1.getX(), npos1.getY(), npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos1.getY(), npos2.getZ()),
-				new Vec3d(npos1.getX(), npos1.getY(), npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos1.getY(), npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos1.getY(), npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos1.getY(), npos1.getZ() + 1d),
-				new Vec3d(npos2.getX() + 1d, npos1.getY(), npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos1.getY(), npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos2.getY() + 1d, npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos2.getY() + 1d, npos2.getZ()),
-				new Vec3d(npos1.getX(), npos2.getY() + 1d, npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos2.getY() + 1d, npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos2.getY() + 1d, npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos2.getY() + 1d, npos1.getZ() + 1d),
-				new Vec3d(npos2.getX() + 1d, npos2.getY() + 1d, npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos2.getY() + 1d, npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos1.getY(), npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos2.getY() + 1d, npos1.getZ() + 1d),
-				new Vec3d(npos2.getX() + 1d, npos1.getY(), npos1.getZ() + 1d),
-				new Vec3d(npos2.getX() + 1d, npos2.getY() + 1d, npos1.getZ() + 1d),
-				new Vec3d(npos1.getX(), npos1.getY(), npos2.getZ()),
-				new Vec3d(npos1.getX(), npos2.getY() + 1d, npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos1.getY(), npos2.getZ()),
-				new Vec3d(npos2.getX() + 1d, npos2.getY() + 1d, npos2.getZ()) };
+		final Vec3d[] vertices = new Vec3d[] { new Vec3d(sPos.getX(), sPos.getY(), sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), sPos.getY(), nPos.getZ()), new Vec3d(sPos.getX(), sPos.getY(), nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, sPos.getY(), nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, sPos.getY(), nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, sPos.getY(), sPos.getZ() + 1d),
+				new Vec3d(nPos.getX() + 1d, sPos.getY(), sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), sPos.getY(), sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), nPos.getY() + 1d, sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), nPos.getY() + 1d, nPos.getZ()),
+				new Vec3d(sPos.getX(), nPos.getY() + 1d, nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, nPos.getY() + 1d, nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, nPos.getY() + 1d, nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, nPos.getY() + 1d, sPos.getZ() + 1d),
+				new Vec3d(nPos.getX() + 1d, nPos.getY() + 1d, sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), nPos.getY() + 1d, sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), sPos.getY(), sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), nPos.getY() + 1d, sPos.getZ() + 1d),
+				new Vec3d(nPos.getX() + 1d, sPos.getY(), sPos.getZ() + 1d),
+				new Vec3d(nPos.getX() + 1d, nPos.getY() + 1d, sPos.getZ() + 1d),
+				new Vec3d(sPos.getX(), sPos.getY(), nPos.getZ()), new Vec3d(sPos.getX(), nPos.getY() + 1d, nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, sPos.getY(), nPos.getZ()),
+				new Vec3d(nPos.getX() + 1d, nPos.getY() + 1d, nPos.getZ()) };
 
 		for (final Vec3d v : vertices) {
 
@@ -140,5 +170,54 @@ public final class ReAnimatorMod implements ClientModInitializer {
 		}
 
 		tessellator.draw();
+	}
+
+	@Override
+	public void setPosition(final Position position, final BlockPos blockPos) {
+
+		switch (position) {
+		case SOURCE_POS1:
+			sourcePos1 = blockPos;
+			break;
+		case SOURCE_POS2:
+			sourcePos2 = blockPos;
+			break;
+		case TARGET_POS1:
+			targetPos1 = blockPos;
+			break;
+		case TARGET_POS2:
+			targetPos2 = blockPos;
+			break;
+		}
+
+		if (targetPos1 != null && sourcePos1 != null && sourcePos2 != null) {
+
+			final int sourceWidth = Math.max(sourcePos1.getX(), sourcePos2.getX())
+					- Math.min(sourcePos1.getX(), sourcePos2.getX());
+			final int sourceHeight = Math.max(sourcePos1.getY(), sourcePos2.getY())
+					- Math.min(sourcePos1.getY(), sourcePos2.getY());
+			final int sourceDepth = Math.max(sourcePos1.getZ(), sourcePos2.getZ())
+					- Math.min(sourcePos1.getZ(), sourcePos2.getZ());
+
+			targetPos2 = new BlockPos(targetPos1.getX() - sourceWidth, targetPos1.getY() - sourceHeight,
+					targetPos1.getZ() - sourceDepth);
+		}
+	}
+
+	@Override
+	public BlockPos getPosition(final Position position) {
+
+		switch (position) {
+		case SOURCE_POS1:
+			return sourcePos1;
+		case SOURCE_POS2:
+			return sourcePos2;
+		case TARGET_POS1:
+			return targetPos1;
+		case TARGET_POS2:
+			return targetPos2;
+		default:
+			return null;
+		}
 	}
 }
