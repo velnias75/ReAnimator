@@ -30,20 +30,20 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
-public final class PosCommand implements Command<FabricClientCommandSource> {
+public final class PosCommand extends ReAnimatorContextCommand {
 
 	private final Position position;
-	private final ReAnimatorContext rCtx;
 
-	public PosCommand(final Position position, final ReAnimatorContext rCtx) {
+	public PosCommand(final Position position, final ReAnimatorContext ctx) {
+		super(ctx);
 		this.position = position;
-		this.rCtx = rCtx;
 	}
 
 	@Override
@@ -66,9 +66,19 @@ public final class PosCommand implements Command<FabricClientCommandSource> {
 		}
 
 		if (blockPos != null) {
-			rCtx.setPosition(position, blockPos);
+
+			context().setPosition(position, blockPos);
 			ctx.getSource().sendFeedback(Text.literal(
 					positionText() + " set to " + blockPos.getX() + ", " + blockPos.getY() + ", " + blockPos.getZ()));
+
+			if (position == Position.TARGET_POS1 && (context().getPosition(Position.SOURCE_POS1) == null
+					|| context().getPosition(Position.SOURCE_POS2) == null)) {
+				ctx.getSource()
+						.sendFeedback(Text.empty()
+								.append(Text.literal("please make a source selection with /spos1 and /spos2"))
+								.formatted(Formatting.ITALIC));
+			}
+
 		} else {
 			ctx.getSource().sendError(Text.literal("Could not determine any block at crosshair position"));
 		}

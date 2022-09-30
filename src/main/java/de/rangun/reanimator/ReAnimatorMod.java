@@ -24,6 +24,8 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import de.rangun.reanimator.commands.PosCommand;
+import de.rangun.reanimator.commands.ScanCommand;
+import de.rangun.reanimator.utils.Utils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -117,6 +119,10 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			dispatcher.register(literal("tpos").executes(new PosCommand(Position.TARGET_POS1, this)));
 		});
+
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			dispatcher.register(literal("scan").executes(new ScanCommand(this)));
+		});
 	}
 
 	private void renderCube(final WorldRenderContext ctx, final BlockPos pos1, final BlockPos pos2, Color color) {
@@ -125,12 +131,8 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 			return;
 		}
 
-		final Vec3d nPos = new Vec3d(Math.min(pos1.getX(), pos2.getX()) - 1d, Math.min(pos1.getY(), pos2.getY()) - 1d,
-				Math.min(pos1.getZ(), pos2.getZ()));
-
-		final Vec3d sPos = new Vec3d(Math.max(pos1.getX(), pos2.getX()) + 1d, Math.max(pos1.getY(), pos2.getY()) + 1d,
-				Math.max(pos1.getZ(), pos2.getZ()));
-
+		final Vec3d nPos = Utils.nPos(pos1, pos2);
+		final Vec3d sPos = Utils.sPos(pos1, pos2);
 		final Vec3d camera = ctx.camera().getPos();
 
 		final Tessellator tessellator = Tessellator.getInstance();
