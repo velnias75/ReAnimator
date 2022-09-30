@@ -30,7 +30,7 @@ import de.rangun.reanimator.utils.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -55,14 +55,16 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 			final BlockPos nPos = new BlockPos(Utils.nPos(targetPos1, targetPos2).add(1d, 1d, 0d));
 			final Vec3i dim = Utils.dimension(targetPos1, targetPos2);
 
-			Utils.traverseArea(new BlockPos(0, 0, 0), new BlockPos(dim.getX(), dim.getY(), dim.getZ()), (pos) -> {
+			Utils.traverseArea(BlockPos.ORIGIN, new BlockPos(dim), (pos) -> {
 
-				final BlockState state = model.get(pos.getX(), pos.getY(), pos.getZ());
+				// final BlockState state = model.get(pos.getX(), pos.getY(), pos.getZ());
+
 				final StringBuilder command = new StringBuilder("setblock ").append(nPos.getX() + pos.getX())
 						.append(' ').append(nPos.getY() + pos.getY()).append(' ').append(nPos.getZ() + pos.getZ())
-						.append(' ').append(Registry.BLOCK.getId(state.getBlock()).toString()).append(" replace");
+						.append(' ').append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK)).append("[facing=")
+						.append(doFacingLayout(pos, dim)).append(']');
 
-				System.out.println(command.toString());
+				// System.out.println(command.toString());
 
 				ctx.getSource().getPlayer().sendCommand(command.toString());
 
@@ -76,5 +78,48 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 		}
 
 		return Command.SINGLE_SUCCESS;
+	}
+
+	private String doFacingLayout(final BlockPos pos, final Vec3i dim) {
+
+		if (pos.getY() % 2 == 0) {
+
+			if (pos.getX() % 2 == 0) {
+
+				if (pos.getZ() == 0) {
+					return pos.getX() != dim.getX() ? "east" : "up";
+				} else {
+					return "north";
+				}
+
+			} else {
+
+				if (pos.getZ() == dim.getZ()) {
+					return pos.getX() != dim.getX() ? "east" : "up";
+				} else {
+					return "south";
+				}
+			}
+
+		} else {
+
+			if (pos.getX() % 2 == 0) {
+
+				if (pos.getZ() == dim.getZ()) {
+					return pos.getX() != 0 ? "west" : "up";
+				} else {
+					return "south";
+				}
+
+			} else {
+
+				if (pos.getZ() != 0) {
+					return "north";
+				} else {
+					return "west";
+				}
+			}
+
+		}
 	}
 }

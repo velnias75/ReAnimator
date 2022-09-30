@@ -52,12 +52,14 @@ public final class ScanCommand extends AbstractReAnimatorContextCommand {
 			final World world = ctx.getSource().getWorld();
 			final SourceModel model = new SourceModel(sPos1, sPos2);
 
-			Utils.traverseArea(sPos1, sPos2, (pos) -> {
+			final long blockCnt = Utils.traverseArea(sPos1, sPos2, (pos) -> {
 				model.set(pos, world.getBlockState(pos));
 				return false;
 			});
 
 			context().setSourceModel(model);
+
+			ctx.getSource().sendFeedback(Text.literal("scanned " + blockCnt + " blocks"));
 
 		} else {
 			ctx.getSource().sendError(

@@ -28,10 +28,12 @@ public final class Utils {
 	private Utils() {
 	}
 
-	public static void traverseArea(final BlockPos pos1, final BlockPos pos2, final AreaVisitor callback) {
+	public static long traverseArea(final BlockPos pos1, final BlockPos pos2, final AreaVisitor callback) {
 
 		final BlockPos nPos = new BlockPos(nPos(pos1, pos2));
 		final BlockPos sPos = new BlockPos(sPos(pos1, pos2));
+
+		long blockCnt = 0;
 
 		for (int y = Math.min(nPos.getY(), sPos.getY()) + 1; y < Math.max(sPos.getY(), nPos.getY()); ++y) {
 
@@ -39,12 +41,16 @@ public final class Utils {
 
 				for (int z = Math.min(nPos.getZ(), sPos.getZ()); z <= Math.max(sPos.getZ(), nPos.getZ()); ++z) {
 
+					++blockCnt;
+
 					if (callback.visit(new BlockPos(x, y, z))) {
-						return;
+						return blockCnt;
 					}
 				}
 			}
 		}
+
+		return blockCnt;
 	}
 
 	public static Vec3d nPos(final BlockPos pos1, final BlockPos pos2) {
