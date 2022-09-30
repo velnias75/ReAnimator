@@ -30,7 +30,11 @@ import de.rangun.reanimator.utils.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.CommandBlockBlockEntity;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.network.packet.c2s.play.UpdateCommandBlockC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -46,35 +50,57 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 	@Override
 	public int run(final CommandContext<FabricClientCommandSource> ctx) throws CommandSyntaxException {
 
-		final SourceModel model = context().getSourceModel();
-		final BlockPos targetPos1 = context().getPosition(Position.TARGET_POS1);
+		final ClientPlayerEntity player = ctx.getSource().getPlayer();
 
-		if (model != null && targetPos1 != null) {
+		if (player.isCreativeLevelTwoOp()) {
 
-			final BlockPos targetPos2 = context().getPosition(Position.TARGET_POS2);
-			final BlockPos nPos = new BlockPos(Utils.nPos(targetPos1, targetPos2).add(1d, 1d, 0d));
-			final Vec3i dim = Utils.dimension(targetPos1, targetPos2);
+			final SourceModel model = context().getSourceModel();
+			final BlockPos targetPos1 = context().getPosition(Position.TARGET_POS1);
 
-			Utils.traverseArea(BlockPos.ORIGIN, new BlockPos(dim), (pos) -> {
+			if (model != null && targetPos1 != null) {
 
-				// final BlockState state = model.get(pos.getX(), pos.getY(), pos.getZ());
+				final BlockPos targetPos2 = context().getPosition(Position.TARGET_POS2);
+				final BlockPos nPos = new BlockPos(Utils.nPos(targetPos1, targetPos2).add(1d, 1d, 0d));
+				final Vec3i dim = Utils.dimension(targetPos1, targetPos2);
 
-				final StringBuilder command = new StringBuilder("setblock ").append(nPos.getX() + pos.getX())
-						.append(' ').append(nPos.getY() + pos.getY()).append(' ').append(nPos.getZ() + pos.getZ())
-						.append(' ').append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK)).append("[facing=")
-						.append(doFacingLayout(pos, dim)).append(']');
+				Utils.traverseArea(BlockPos.ORIGIN, new BlockPos(dim), (pos) -> {
 
-				// System.out.println(command.toString());
+					final StringBuilder air = new StringBuilder("setblock ").append(nPos.getX() + pos.getX())
+							.append(' ').append(nPos.getY() + pos.getY()).append(' ').append(nPos.getZ() + pos.getZ())
+							.append(' ').append(Registry.BLOCK.getId(Blocks.AIR).toString()).append(" replace");
 
-				ctx.getSource().getPlayer().sendCommand(command.toString());
+					final StringBuilder command = new StringBuilder("setblock ").append(nPos.getX() + pos.getX())
+							.append(' ').append(nPos.getY() + pos.getY()).append(' ').append(nPos.getZ() + pos.getZ())
+							.append(' ').append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK).toString())
+							.append("[conditional=false,facing=").append(doFacingLayout(pos, dim))
+							.append("]{CustomName:'{\"text\":\"ReAnimator by Velnias75\"}',auto:true} replace");
 
-				return false;
-			});
+					final BlockState state = model.get(pos.getX(), pos.getY(), pos.getZ());
 
-		} else if (model == null) {
-			ctx.getSource().sendError(Text.literal("please scan a model first with /scan"));
-		} else if (targetPos1 == null) {
-			ctx.getSource().sendError(Text.literal("please set a target position first with /tpos"));
+					player.sendCommand(air.toString());
+					player.sendCommand(command.toString());
+
+					if (!Blocks.AIR.equals(state.getBlock())) {
+
+						player.networkHandler.sendPacket(new UpdateCommandBlockC2SPacket(
+								new BlockPos(nPos.getX() + pos.getX(), nPos.getY() + pos.getY(),
+										nPos.getZ() + pos.getZ()),
+								createSummonCommand(state, "ra", 5, -72000), CommandBlockBlockEntity.Type.SEQUENCE,
+								false, false, true));
+
+					}
+
+					return false;
+				});
+
+			} else if (model == null) {
+				ctx.getSource().sendError(Text.literal("please scan a model first with /scan"));
+			} else if (targetPos1 == null) {
+				ctx.getSource().sendError(Text.literal("please set a target position first with /tpos"));
+			}
+
+		} else {
+			ctx.getSource().sendError(Text.literal("must be an - at least level 2 - opped player in creative mode"));
 		}
 
 		return Command.SINGLE_SUCCESS;
@@ -121,5 +147,14 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 			}
 
 		}
+	}
+
+	private String createSummonCommand(final BlockState state, String tag, double gap, int time) {
+		return "summon armor_stand ~ ~" + gap + " ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,"
+				+ "HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,"
+				+ "NoBasePlate:1b,PersistenceRequired:0b,Tags:[\" + tag + \"],Passengers:[{id:\"minecraft:falling_block\",BlockState:{Name:\""
+				+ Registry.BLOCK.getId(state.getBlock()).toString()
+				+ "\"},NoGravity:1b,Silent:1b,HasVisualFire:0b,Glowing:0b,Time:" + time
+				+ ",DropItem:0b,HurtEntities:0b,Tags:[\"" + tag + "\"]}],Rotation:[-180F,0F]}";
 	}
 }
