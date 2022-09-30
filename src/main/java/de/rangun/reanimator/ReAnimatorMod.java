@@ -23,6 +23,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import de.rangun.reanimator.commands.AssembleCommand;
 import de.rangun.reanimator.commands.PosCommand;
 import de.rangun.reanimator.commands.ScanCommand;
 import de.rangun.reanimator.model.SourceModel;
@@ -130,6 +131,10 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			dispatcher.register(literal("scan").executes(new ScanCommand(this)));
+		});
+
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+			dispatcher.register(literal("assemble").executes(new AssembleCommand(this)));
 		});
 	}
 
