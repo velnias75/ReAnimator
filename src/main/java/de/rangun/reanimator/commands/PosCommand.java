@@ -37,7 +37,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
-public final class PosCommand extends ReAnimatorContextCommand {
+public final class PosCommand extends AbstractReAnimatorContextCommand {
 
 	private final Position position;
 

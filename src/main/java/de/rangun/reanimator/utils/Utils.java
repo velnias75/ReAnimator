@@ -21,6 +21,7 @@ package de.rangun.reanimator.utils;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 
 public final class Utils {
 
@@ -54,5 +55,11 @@ public final class Utils {
 	public static Vec3d sPos(final BlockPos pos1, final BlockPos pos2) {
 		return new Vec3d(Math.max(pos1.getX(), pos2.getX()) + 1d, Math.max(pos1.getY(), pos2.getY()) + 1d,
 				Math.max(pos1.getZ(), pos2.getZ()));
+	}
+
+	public static Vec3i dimension(final BlockPos pos1, final BlockPos pos2) {
+		return new Vec3i(Math.max(pos1.getX(), pos2.getX()) - Math.min(pos1.getX(), pos2.getX()),
+				Math.max(pos1.getY(), pos2.getY()) - Math.min(pos1.getY(), pos2.getY()),
+				Math.max(pos1.getZ(), pos2.getZ()) - Math.min(pos1.getZ(), pos2.getZ()));
 	}
 }

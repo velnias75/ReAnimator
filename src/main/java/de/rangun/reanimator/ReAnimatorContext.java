@@ -19,6 +19,7 @@
 
 package de.rangun.reanimator;
 
+import de.rangun.reanimator.model.SourceModel;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.math.BlockPos;
@@ -34,4 +35,7 @@ public interface ReAnimatorContext {
 
 	BlockPos getPosition(Position position);
 
+	void setSourceModel(SourceModel model);
+
+	SourceModel getSourceModel();
 }

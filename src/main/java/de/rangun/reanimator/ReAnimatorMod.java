@@ -25,6 +25,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import de.rangun.reanimator.commands.PosCommand;
 import de.rangun.reanimator.commands.ScanCommand;
+import de.rangun.reanimator.model.SourceModel;
 import de.rangun.reanimator.utils.Utils;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -40,6 +41,7 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 
 @Environment(EnvType.CLIENT)
 public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext {
@@ -75,6 +77,8 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		}
 	};
 
+	private SourceModel sourceModel = null;
+
 	private BlockPos sourcePos1 = null;
 	private BlockPos sourcePos2 = null;
 
@@ -102,10 +106,14 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		});
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+
+			sourceModel = null;
+
 			sourcePos1 = null;
 			sourcePos2 = null;
 			targetPos1 = null;
 			targetPos2 = null;
+
 		});
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
@@ -194,15 +202,10 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 
 		if (targetPos1 != null && sourcePos1 != null && sourcePos2 != null) {
 
-			final int sourceWidth = Math.max(sourcePos1.getX(), sourcePos2.getX())
-					- Math.min(sourcePos1.getX(), sourcePos2.getX());
-			final int sourceHeight = Math.max(sourcePos1.getY(), sourcePos2.getY())
-					- Math.min(sourcePos1.getY(), sourcePos2.getY());
-			final int sourceDepth = Math.max(sourcePos1.getZ(), sourcePos2.getZ())
-					- Math.min(sourcePos1.getZ(), sourcePos2.getZ());
+			final Vec3i dim = Utils.dimension(sourcePos1, sourcePos2);
 
-			targetPos2 = new BlockPos(targetPos1.getX() - sourceWidth, targetPos1.getY() - sourceHeight,
-					targetPos1.getZ() - sourceDepth);
+			targetPos2 = new BlockPos(targetPos1.getX() - dim.getX(), targetPos1.getY() - dim.getY(),
+					targetPos1.getZ() - dim.getZ());
 		}
 	}
 
@@ -221,5 +224,15 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		default:
 			throw new IllegalStateException("invalid position");
 		}
+	}
+
+	@Override
+	public void setSourceModel(final SourceModel model) {
+		this.sourceModel = model;
+	}
+
+	@Override
+	public SourceModel getSourceModel() {
+		return sourceModel;
 	}
 }

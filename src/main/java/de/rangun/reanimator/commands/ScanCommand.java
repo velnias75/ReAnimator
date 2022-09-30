@@ -25,17 +25,17 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import de.rangun.reanimator.ReAnimatorContext;
 import de.rangun.reanimator.ReAnimatorContext.Position;
+import de.rangun.reanimator.model.SourceModel;
 import de.rangun.reanimator.utils.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.block.BlockState;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Environment(EnvType.CLIENT)
-public final class ScanCommand extends ReAnimatorContextCommand {
+public final class ScanCommand extends AbstractReAnimatorContextCommand {
 
 	public ScanCommand(final ReAnimatorContext ctx) {
 		super(ctx);
@@ -47,19 +47,17 @@ public final class ScanCommand extends ReAnimatorContextCommand {
 		final BlockPos sPos1 = context().getPosition(Position.SOURCE_POS1);
 		final BlockPos sPos2 = context().getPosition(Position.SOURCE_POS2);
 
-		final World world = ctx.getSource().getWorld();
-
 		if (!(sPos1 == null || sPos2 == null)) {
 
+			final World world = ctx.getSource().getWorld();
+			final SourceModel model = new SourceModel(sPos1, sPos2);
+
 			Utils.traverseArea(sPos1, sPos2, (pos) -> {
-
-				final BlockState state = world.getBlockState(pos);
-
-				System.out.println(
-						"x=" + pos.getX() + ", y=" + pos.getY() + ", z=" + pos.getZ() + ", state=" + state.toString());
-
+				model.set(pos, world.getBlockState(pos));
 				return false;
 			});
+
+			context().setSourceModel(model);
 
 		} else {
 			ctx.getSource().sendError(

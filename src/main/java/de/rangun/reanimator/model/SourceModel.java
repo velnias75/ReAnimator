@@ -19,6 +19,12 @@
 
 package de.rangun.reanimator.model;
 
-public final class SourceModel {
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
 
+public final class SourceModel extends BaseModel<BlockState> {
+
+	public SourceModel(final BlockPos pos1, final BlockPos pos2) {
+		super(pos1, pos2);
+	}
 }

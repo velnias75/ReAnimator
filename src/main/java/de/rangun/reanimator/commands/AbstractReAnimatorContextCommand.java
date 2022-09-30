@@ -24,11 +24,11 @@ import com.mojang.brigadier.Command;
 import de.rangun.reanimator.ReAnimatorContext;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
-abstract class ReAnimatorContextCommand implements Command<FabricClientCommandSource> {
+abstract class AbstractReAnimatorContextCommand implements Command<FabricClientCommandSource> {
 
 	private final ReAnimatorContext ctx;
 
-	public ReAnimatorContextCommand(final ReAnimatorContext ctx) {
+	protected AbstractReAnimatorContextCommand(final ReAnimatorContext ctx) {
 		this.ctx = ctx;
 	}
 
