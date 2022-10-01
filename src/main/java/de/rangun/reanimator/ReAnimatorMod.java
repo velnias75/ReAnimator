@@ -52,7 +52,7 @@ import net.minecraft.util.math.Vec3d;
 public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext {
 
 	private final static double DEFAULT_GAP = 3.0d;
-	private final static int DEFAULT_TIME = -72000;
+	private final static int DEFAULT_TIME = -2147483648;
 
 	private static enum Color {
 
