@@ -19,6 +19,8 @@
 
 package de.rangun.reanimator.commands;
 
+import java.util.stream.Collectors;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -31,6 +33,7 @@ import de.rangun.reanimator.utils.Utils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
@@ -48,12 +51,22 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 	private final double gap;
 	private final int time;
 
+	private String modName = "ReAnimator";
+	private String modAuthors = "Velnias75, et al.";
+
 	public AssembleCommand(final ReAnimatorContext ctx, final String tag, final double gap, final int time) {
 		super(ctx);
 
 		this.tag = tag;
 		this.gap = gap + 0.5d;
 		this.time = time;
+
+		FabricLoader.getInstance().getModContainer("reanimator").ifPresent((mc) -> {
+			this.modName = mc.getMetadata().getName();
+			this.modAuthors = mc.getMetadata().getAuthors().stream().map((p) -> {
+				return p.getName();
+			}).collect(Collectors.joining(", "));
+		});
 	}
 
 	@Override
@@ -87,7 +100,8 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 							.append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
 							.append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK).toString())
 							.append("[conditional=false,facing=").append(doFacingLayout(modelPos, dim))
-							.append("]{CustomName:'{\"text\":\"ReAnimator by Velnias75\"}',auto:true} replace");
+							.append("]{CustomName:'{\"text\":\"").append(modName).append(" by ").append(modAuthors)
+							.append("\"}',auto:true} replace");
 
 					final BlockState state = model.get(modelPos.getX(), modelPos.getY(), modelPos.getZ());
 
