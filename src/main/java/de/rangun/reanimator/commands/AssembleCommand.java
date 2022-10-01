@@ -19,14 +19,10 @@
 
 package de.rangun.reanimator.commands;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.JsonOps;
 
 import de.rangun.reanimator.ReAnimatorContext;
 import de.rangun.reanimator.ReAnimatorContext.Position;
@@ -40,7 +36,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.UpdateCommandBlockC2SPacket;
-import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -48,14 +43,6 @@ import net.minecraft.util.registry.Registry;
 
 @Environment(EnvType.CLIENT)
 public final class AssembleCommand extends AbstractReAnimatorContextCommand {
-
-	private static final Function<Map.Entry<Property<?>, Comparable<?>>, String> PROPERTY_MAP_PRINTER = new Function<Map.Entry<Property<?>, Comparable<?>>, String>() {
-
-		@Override
-		public String apply(final Entry<Property<?>, Comparable<?>> entry) {
-			return "\"" + entry.getKey().getName() + "\":\"" + entry.getValue() + "\"";
-		}
-	};
 
 	private final String tag;
 	private final double gap;
@@ -175,15 +162,11 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 	}
 
 	private String createSummonCommand(final BlockState state, final Vec3i dim) {
-
-		final String properties = state.getEntries().entrySet().stream().map(PROPERTY_MAP_PRINTER)
-				.collect(Collectors.joining(","));
-
 		return new StringBuilder("summon armor_stand ~ ~").append(gap + dim.getY()).append(
 				" ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,NoBasePlate:1b,PersistenceRequired:0b,Tags:[\"")
-				.append(tag).append("\"],Passengers:[{id:\"minecraft:falling_block\",BlockState:{Name:\"")
-				.append(Registry.BLOCK.getId(state.getBlock()).toString()).append("\",Properties:{").append(properties)
-				.append("}},NoGravity:1b,Silent:1b,HasVisualFire:0b,Glowing:0b,Time:").append(time)
+				.append(tag).append("\"],Passengers:[{id:\"minecraft:falling_block\",BlockState:")
+				.append(BlockState.CODEC.encodeStart(JsonOps.INSTANCE, state).result().get())
+				.append(",NoGravity:1b,Silent:1b,HasVisualFire:0b,Glowing:0b,Time:").append(time)
 				.append(",DropItem:0b,HurtEntities:0b,Tags:[\"").append(tag).append("\"]}],Rotation:[-180F,0F]}")
 				.toString();
 	}
