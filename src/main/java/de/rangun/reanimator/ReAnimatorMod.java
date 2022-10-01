@@ -19,8 +19,6 @@
 
 package de.rangun.reanimator;
 
-import static com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg;
-import static com.mojang.brigadier.arguments.DoubleArgumentType.getDouble;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
@@ -49,17 +47,16 @@ import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 
 @Environment(EnvType.CLIENT)
 public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext {
 
-	private final static double DEFAULT_GAP = 5.0d;
+	private final static double DEFAULT_GAP = 3.0d;
 	private final static int DEFAULT_TIME = -72000;
 
 	private static enum Color {
 
-		RED(255, 0, 0, 255), BLUE(0, 0, 255, 255);
+		RED(255, 0, 0, 255), BLUE(0, 0, 255, 255), YELLOW(255, 255, 0, 255);
 
 		private final int r, g, b, a;
 
@@ -96,6 +93,9 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 	private BlockPos targetPos1 = null;
 	private BlockPos targetPos2 = null;
 
+	private BlockPos resultPos1 = null;
+	private BlockPos resultPos2 = null;
+
 	@Override
 	public void onInitializeClient() {
 
@@ -110,6 +110,7 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 
 			renderCube(ctx, sourcePos1, sourcePos2, Color.RED);
 			renderCube(ctx, targetPos1, targetPos2, Color.BLUE);
+			renderCube(ctx, resultPos1, resultPos2, Color.YELLOW);
 
 			RenderSystem.enableBlend();
 			RenderSystem.enableTexture();
@@ -146,12 +147,13 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			dispatcher.register(literal("assemble").requires((source) -> source.getPlayer().isCreativeLevelTwoOp())
 					.then((argument("tag", word()))
-							.then(argument("gap", doubleArg())
+							.then(argument("gap", integer())
 									.executes((ctx) -> (new AssembleCommand(this, getString(ctx, "tag"),
-											getDouble(ctx, "gap"), DEFAULT_TIME).run(ctx)))
+											(double) getInteger(ctx, "gap"), DEFAULT_TIME).run(ctx)))
 									.then(argument("time", integer())
 											.executes((ctx) -> (new AssembleCommand(this, getString(ctx, "tag"),
-													getDouble(ctx, "gap"), getInteger(ctx, "time")).run(ctx)))))
+													(double) getInteger(ctx, "gap"), getInteger(ctx, "time"))
+													.run(ctx)))))
 							.executes((
 									ctx) -> (new AssembleCommand(this, getString(ctx, "tag"), DEFAULT_GAP, DEFAULT_TIME)
 											.run(ctx)))));
@@ -223,14 +225,16 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		case TARGET_POS2:
 			targetPos2 = blockPos;
 			break;
+		case RESULT_POS1:
+			resultPos1 = blockPos;
+			break;
+		case RESULT_POS2:
+			resultPos2 = blockPos;
+			break;
 		}
 
 		if (targetPos1 != null && sourcePos1 != null && sourcePos2 != null) {
-
-			final Vec3i dim = Utils.dimension(sourcePos1, sourcePos2);
-
-			targetPos2 = new BlockPos(targetPos1.getX() - dim.getX(), targetPos1.getY() - dim.getY(),
-					targetPos1.getZ() - dim.getZ());
+			targetPos2 = targetPos1.subtract(Utils.dimension(sourcePos1, sourcePos2));
 		}
 	}
 
@@ -246,6 +250,10 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 			return targetPos1;
 		case TARGET_POS2:
 			return targetPos2;
+		case RESULT_POS1:
+			return resultPos1;
+		case RESULT_POS2:
+			return resultPos2;
 		default:
 			throw new IllegalStateException("invalid position");
 		}

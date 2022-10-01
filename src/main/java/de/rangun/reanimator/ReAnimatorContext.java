@@ -28,7 +28,7 @@ import net.minecraft.util.math.BlockPos;
 public interface ReAnimatorContext {
 
 	public enum Position {
-		SOURCE_POS1, SOURCE_POS2, TARGET_POS1, TARGET_POS2;
+		SOURCE_POS1, SOURCE_POS2, TARGET_POS1, TARGET_POS2, RESULT_POS1, RESULT_POS2;
 	}
 
 	void setPosition(Position position, BlockPos blockPos);

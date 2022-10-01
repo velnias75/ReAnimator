@@ -51,7 +51,7 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 		super(ctx);
 
 		this.tag = tag;
-		this.gap = gap;
+		this.gap = gap + 0.5d;
 		this.time = time;
 	}
 
@@ -70,6 +70,12 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 				final BlockPos targetPos2 = context().getPosition(Position.TARGET_POS2);
 				final BlockPos nPos = new BlockPos(Utils.nPos(targetPos1, targetPos2).add(1d, 1d, 0d));
 				final Vec3i dim = Utils.dimension(targetPos1, targetPos2);
+
+				final BlockPos rPos1 = targetPos1.add(0d, gap + dim.getY() + 1d, 0d);
+				final BlockPos rPos2 = targetPos2.add(0d, gap + dim.getY() + 1d, 0d);
+
+				context().setPosition(Position.RESULT_POS1, rPos1);
+				context().setPosition(Position.RESULT_POS2, rPos2);
 
 				Utils.traverseArea(BlockPos.ORIGIN, new BlockPos(dim), (modelPos) -> {
 
@@ -93,8 +99,9 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 					if (!(Blocks.AIR.equals(state.getBlock()) || Blocks.CAVE_AIR.equals(state.getBlock())
 							|| Blocks.VOID_AIR.equals(state.getBlock()))) {
 
-						player.networkHandler.sendPacket(new UpdateCommandBlockC2SPacket(worldPos,
-								createSummonCommand(state), CommandBlockBlockEntity.Type.SEQUENCE, false, false, true));
+						player.networkHandler
+								.sendPacket(new UpdateCommandBlockC2SPacket(worldPos, createSummonCommand(state, dim),
+										CommandBlockBlockEntity.Type.SEQUENCE, false, false, true));
 					}
 
 					return false;
@@ -156,8 +163,9 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 		}
 	}
 
-	private String createSummonCommand(final BlockState state) {
-		return "summon armor_stand ~ ~" + gap + " ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,"
+	private String createSummonCommand(final BlockState state, final Vec3i dim) {
+		return "summon armor_stand ~ ~" + (gap + dim.getY())
+				+ " ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,"
 				+ "HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,"
 				+ "NoBasePlate:1b,PersistenceRequired:0b,Tags:[\"" + tag
 				+ "\"],Passengers:[{id:\"minecraft:falling_block\",BlockState:{Name:\""
