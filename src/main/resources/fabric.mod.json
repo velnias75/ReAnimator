@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "reanimator",
-	"version": "@version@",
+	"version": "${version}",
 	"name": "ReAnimator",
 	"description": "Pre-build your animation models and turn them into command blocks.",
 	"authors": [
