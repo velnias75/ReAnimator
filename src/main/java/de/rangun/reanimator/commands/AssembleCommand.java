@@ -47,7 +47,7 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 	private final double gap;
 	private final int time;
 
-	public AssembleCommand(final ReAnimatorContext ctx, String tag, double gap, int time) {
+	public AssembleCommand(final ReAnimatorContext ctx, final String tag, final double gap, final int time) {
 		super(ctx);
 
 		this.tag = tag;
@@ -71,28 +71,29 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 				final BlockPos nPos = new BlockPos(Utils.nPos(targetPos1, targetPos2).add(1d, 1d, 0d));
 				final Vec3i dim = Utils.dimension(targetPos1, targetPos2);
 
-				Utils.traverseArea(BlockPos.ORIGIN, new BlockPos(dim), (pos) -> {
+				Utils.traverseArea(BlockPos.ORIGIN, new BlockPos(dim), (modelPos) -> {
 
-					final StringBuilder air = new StringBuilder("setblock ").append(nPos.getX() + pos.getX())
-							.append(' ').append(nPos.getY() + pos.getY()).append(' ').append(nPos.getZ() + pos.getZ())
-							.append(' ').append(Registry.BLOCK.getId(Blocks.AIR).toString()).append(" replace");
+					final BlockPos worldPos = nPos.add(modelPos);
 
-					final StringBuilder command = new StringBuilder("setblock ").append(nPos.getX() + pos.getX())
-							.append(' ').append(nPos.getY() + pos.getY()).append(' ').append(nPos.getZ() + pos.getZ())
-							.append(' ').append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK).toString())
-							.append("[conditional=false,facing=").append(doFacingLayout(pos, dim))
+					final StringBuilder air = new StringBuilder("setblock ").append(worldPos.getX()).append(' ')
+							.append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
+							.append(Registry.BLOCK.getId(Blocks.AIR).toString()).append(" replace");
+
+					final StringBuilder command = new StringBuilder("setblock ").append(worldPos.getX()).append(' ')
+							.append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
+							.append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK).toString())
+							.append("[conditional=false,facing=").append(doFacingLayout(modelPos, dim))
 							.append("]{CustomName:'{\"text\":\"ReAnimator by Velnias75\"}',auto:true} replace");
 
-					final BlockState state = model.get(pos.getX(), pos.getY(), pos.getZ());
+					final BlockState state = model.get(modelPos.getX(), modelPos.getY(), modelPos.getZ());
 
 					player.sendCommand(air.toString());
 					player.sendCommand(command.toString());
 
-					if (!Blocks.AIR.equals(state.getBlock())) {
+					if (!(Blocks.AIR.equals(state.getBlock()) || Blocks.CAVE_AIR.equals(state.getBlock())
+							|| Blocks.VOID_AIR.equals(state.getBlock()))) {
 
-						player.networkHandler.sendPacket(new UpdateCommandBlockC2SPacket(
-								new BlockPos(nPos.getX() + pos.getX(), nPos.getY() + pos.getY(),
-										nPos.getZ() + pos.getZ()),
+						player.networkHandler.sendPacket(new UpdateCommandBlockC2SPacket(worldPos,
 								createSummonCommand(state), CommandBlockBlockEntity.Type.SEQUENCE, false, false, true));
 					}
 
