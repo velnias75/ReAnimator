@@ -43,8 +43,16 @@ import net.minecraft.util.registry.Registry;
 @Environment(EnvType.CLIENT)
 public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 
-	public AssembleCommand(final ReAnimatorContext ctx) {
+	private final String tag;
+	private final double gap;
+	private final int time;
+
+	public AssembleCommand(final ReAnimatorContext ctx, String tag, double gap, int time) {
 		super(ctx);
+
+		this.tag = tag;
+		this.gap = gap;
+		this.time = time;
 	}
 
 	@Override
@@ -85,9 +93,7 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 						player.networkHandler.sendPacket(new UpdateCommandBlockC2SPacket(
 								new BlockPos(nPos.getX() + pos.getX(), nPos.getY() + pos.getY(),
 										nPos.getZ() + pos.getZ()),
-								createSummonCommand(state, "ra", 5, -72000), CommandBlockBlockEntity.Type.SEQUENCE,
-								false, false, true));
-
+								createSummonCommand(state), CommandBlockBlockEntity.Type.SEQUENCE, false, false, true));
 					}
 
 					return false;
@@ -149,10 +155,11 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 		}
 	}
 
-	private String createSummonCommand(final BlockState state, String tag, double gap, int time) {
+	private String createSummonCommand(final BlockState state) {
 		return "summon armor_stand ~ ~" + gap + " ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,"
 				+ "HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,"
-				+ "NoBasePlate:1b,PersistenceRequired:0b,Tags:[\" + tag + \"],Passengers:[{id:\"minecraft:falling_block\",BlockState:{Name:\""
+				+ "NoBasePlate:1b,PersistenceRequired:0b,Tags:[\"" + tag
+				+ "\"],Passengers:[{id:\"minecraft:falling_block\",BlockState:{Name:\""
 				+ Registry.BLOCK.getId(state.getBlock()).toString()
 				+ "\"},NoGravity:1b,Silent:1b,HasVisualFire:0b,Glowing:0b,Time:" + time
 				+ ",DropItem:0b,HurtEntities:0b,Tags:[\"" + tag + "\"]}],Rotation:[-180F,0F]}";

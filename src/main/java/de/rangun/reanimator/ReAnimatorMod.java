@@ -19,6 +19,13 @@
 
 package de.rangun.reanimator;
 
+import static com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg;
+import static com.mojang.brigadier.arguments.DoubleArgumentType.getDouble;
+import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
+import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
+import static com.mojang.brigadier.arguments.StringArgumentType.getString;
+import static com.mojang.brigadier.arguments.StringArgumentType.word;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -46,6 +53,9 @@ import net.minecraft.util.math.Vec3i;
 
 @Environment(EnvType.CLIENT)
 public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext {
+
+	private final static double DEFAULT_GAP = 5.0d;
+	private final static int DEFAULT_TIME = -72000;
 
 	private static enum Color {
 
@@ -134,7 +144,17 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		});
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-			dispatcher.register(literal("assemble").executes(new AssembleCommand(this)));
+			dispatcher.register(literal("assemble").requires((source) -> source.getPlayer().isCreativeLevelTwoOp())
+					.then((argument("tag", word()))
+							.then(argument("gap", doubleArg())
+									.executes((ctx) -> (new AssembleCommand(this, getString(ctx, "tag"),
+											getDouble(ctx, "gap"), DEFAULT_TIME).run(ctx)))
+									.then(argument("time", integer())
+											.executes((ctx) -> (new AssembleCommand(this, getString(ctx, "tag"),
+													getDouble(ctx, "gap"), getInteger(ctx, "time")).run(ctx)))))
+							.executes((
+									ctx) -> (new AssembleCommand(this, getString(ctx, "tag"), DEFAULT_GAP, DEFAULT_TIME)
+											.run(ctx)))));
 		});
 	}
 
