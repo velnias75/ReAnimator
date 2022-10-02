@@ -28,3 +28,6 @@ Syntax: `/assemble <tag> [gap] [time]`
 This *mod* is in very early development.<br />
 So **don't use it on productive worlds**, but generate a test world.<br />
 If you want to **support** the development, join my [Discord](https://discord.gg/tkX9BcwCCS) and/or use the [Issues](https://github.com/velnias75/ReAnimator/issues).
+
+# Video
+[YouTube video by Richterlich](https://youtu.be/XPBeLFLsFO0)
