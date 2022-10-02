@@ -45,7 +45,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 
 @Environment(EnvType.CLIENT)
-public final class AssembleCommand extends AbstractReAnimatorContextCommand {
+public final class AssembleCommand extends AbstractReAnimatorContextCommand { // NOPMD by heiko on 02.10.22, 01:55
 
 	private final String tag;
 	private final double gap;
@@ -92,12 +92,12 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 
 					final BlockPos worldPos = nPos.add(modelPos);
 
-					final StringBuilder air = new StringBuilder("setblock ").append(worldPos.getX()).append(' ')
-							.append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
+					final StringBuilder air = new StringBuilder(256).append("setblock ").append(worldPos.getX())
+							.append(' ').append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
 							.append(Registry.BLOCK.getId(Blocks.AIR).toString()).append(" replace");
 
-					final StringBuilder command = new StringBuilder("setblock ").append(worldPos.getX()).append(' ')
-							.append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
+					final StringBuilder command = new StringBuilder(256).append("setblock ").append(worldPos.getX())
+							.append(' ').append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
 							.append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK).toString())
 							.append("[conditional=false,facing=").append(doFacingLayout(modelPos, dim))
 							.append("]{CustomName:'{\"text\":\"").append(modName).append(" by ").append(modAuthors)
@@ -132,24 +132,24 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 		return Command.SINGLE_SUCCESS;
 	}
 
-	private String doFacingLayout(final BlockPos pos, final Vec3i dim) {
+	private String doFacingLayout(final BlockPos pos, final Vec3i dim) { // NOPMD by heiko on 02.10.22, 01:54
 
 		if (pos.getY() % 2 == 0) {
 
 			if (pos.getX() % 2 == 0) {
 
 				if (pos.getZ() == 0) {
-					return pos.getX() != dim.getX() ? "east" : "up";
+					return pos.getX() != dim.getX() ? "east" : "up"; // NOPMD by heiko on 02.10.22, 01:58
 				} else {
-					return "north";
+					return "north"; // NOPMD by heiko on 02.10.22, 01:59
 				}
 
 			} else {
 
 				if (pos.getZ() == dim.getZ()) {
-					return pos.getX() != dim.getX() ? "east" : "up";
+					return pos.getX() != dim.getX() ? "east" : "up"; // NOPMD by heiko on 02.10.22, 01:58
 				} else {
-					return "south";
+					return "south"; // NOPMD by heiko on 02.10.22, 01:59
 				}
 			}
 
@@ -158,15 +158,15 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 			if (pos.getX() % 2 == 0) {
 
 				if (pos.getZ() == dim.getZ()) {
-					return pos.getX() != 0 ? "west" : "up";
+					return pos.getX() != 0 ? "west" : "up"; // NOPMD by heiko on 02.10.22, 01:58
 				} else {
-					return "south";
+					return "south"; // NOPMD by heiko on 02.10.22, 01:59
 				}
 
 			} else {
 
-				if (pos.getZ() != 0) {
-					return "north";
+				if (pos.getZ() != 0) { // NOPMD by heiko on 02.10.22, 01:58
+					return "north"; // NOPMD by heiko on 02.10.22, 01:59
 				} else {
 					return "west";
 				}
@@ -176,7 +176,7 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand {
 	}
 
 	private String createSummonCommand(final BlockState state, final Vec3i dim) {
-		return new StringBuilder("summon armor_stand ~ ~").append(gap + dim.getY()).append(
+		return new StringBuilder(4096).append("summon armor_stand ~ ~").append(gap + dim.getY()).append(
 				" ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,NoBasePlate:1b,PersistenceRequired:0b,Tags:[\"")
 				.append(tag).append("\"],Passengers:[{id:\"minecraft:falling_block\",BlockState:")
 				.append(BlockState.CODEC.encodeStart(JsonOps.INSTANCE, state).result().get())

@@ -43,8 +43,8 @@ public final class Utils {
 
 					++blockCnt;
 
-					if (callback.visit(new BlockPos(x, y, z))) {
-						return blockCnt;
+					if (callback.visit(new BlockPos(x, y, z))) { // NOPMD by heiko on 02.10.22, 01:47
+						return blockCnt; // NOPMD by heiko on 02.10.22, 01:47
 					}
 				}
 			}

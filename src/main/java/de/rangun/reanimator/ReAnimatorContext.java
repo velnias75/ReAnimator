@@ -27,7 +27,7 @@ import net.minecraft.util.math.BlockPos;
 @Environment(EnvType.CLIENT)
 public interface ReAnimatorContext {
 
-	public enum Position {
+	enum Position {
 		SOURCE_POS1, SOURCE_POS2, TARGET_POS1, TARGET_POS2, RESULT_POS1, RESULT_POS2;
 	}
 

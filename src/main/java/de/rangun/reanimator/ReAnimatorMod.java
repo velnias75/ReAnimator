@@ -17,7 +17,7 @@
  * along with ReAnimator.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.rangun.reanimator;
+package de.rangun.reanimator; // NOPMD by heiko on 02.10.22, 02:03
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
@@ -51,16 +51,18 @@ import net.minecraft.util.math.Vec3d;
 @Environment(EnvType.CLIENT)
 public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext {
 
-	private final static double DEFAULT_GAP = 3.0d;
-	private final static int DEFAULT_TIME = -2147483648;
+	private final static String TAG_ARGUMENT = "tag";
 
-	private static enum Color {
+	private final static double DEFAULT_GAP = 3.0d;
+	private final static int DEFAULT_TIME = -2_147_483_648;
+
+	private enum Color {
 
 		RED(255, 0, 0, 255), BLUE(0, 0, 255, 255), YELLOW(255, 255, 0, 255);
 
-		private final int r, g, b, a;
+		private final int r, g, b, a; // NOPMD by heiko on 02.10.22, 02:06
 
-		Color(int r, int g, int b, int a) {
+		Color(final int r, final int g, final int b, final int a) { // NOPMD by heiko on 02.10.22, 02:16
 
 			this.r = r;
 			this.g = g;
@@ -83,18 +85,18 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		public int alpha() {
 			return a;
 		}
-	};
+	}
 
-	private SourceModel sourceModel = null;
+	private SourceModel sourceModel;
 
-	private BlockPos sourcePos1 = null;
-	private BlockPos sourcePos2 = null;
+	private BlockPos sourcePos1;
+	private BlockPos sourcePos2;
 
-	private BlockPos targetPos1 = null;
-	private BlockPos targetPos2 = null;
+	private BlockPos targetPos1;
+	private BlockPos targetPos2;
 
-	private BlockPos resultPos1 = null;
-	private BlockPos resultPos2 = null;
+	private BlockPos resultPos1;
+	private BlockPos resultPos2;
 
 	@Override
 	public void onInitializeClient() {
@@ -119,12 +121,15 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 
-			sourceModel = null;
+			sourceModel = null; // NOPMD by heiko on 02.10.22, 02:11
 
-			sourcePos1 = null;
-			sourcePos2 = null;
-			targetPos1 = null;
-			targetPos2 = null;
+			sourcePos1 = null; // NOPMD by heiko on 02.10.22, 02:11
+			sourcePos2 = null; // NOPMD by heiko on 02.10.22, 02:11
+			targetPos1 = null; // NOPMD by heiko on 02.10.22, 02:11
+			targetPos2 = null; // NOPMD by heiko on 02.10.22, 02:11
+
+			resultPos1 = null; // NOPMD by heiko on 02.10.22, 02:12
+			resultPos2 = null; // NOPMD by heiko on 02.10.22, 02:12
 
 		});
 
@@ -145,22 +150,27 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		});
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-			dispatcher.register(literal("assemble").requires((source) -> source.getPlayer().isCreativeLevelTwoOp())
-					.then((argument("tag", word()))
-							.then(argument("gap", integer())
-									.executes((ctx) -> (new AssembleCommand(this, getString(ctx, "tag"),
-											(double) getInteger(ctx, "gap"), DEFAULT_TIME).run(ctx)))
-									.then(argument("time", integer())
-											.executes((ctx) -> (new AssembleCommand(this, getString(ctx, "tag"),
-													(double) getInteger(ctx, "gap"), getInteger(ctx, "time"))
-													.run(ctx)))))
-							.executes((
-									ctx) -> (new AssembleCommand(this, getString(ctx, "tag"), DEFAULT_GAP, DEFAULT_TIME)
-											.run(ctx)))));
+			dispatcher
+					.register(
+							literal("assemble")
+									.requires(
+											(source) -> source.getPlayer().isCreativeLevelTwoOp())
+									.then(argument(TAG_ARGUMENT, word())
+											.then(argument("gap", integer())
+													.executes((ctx) -> new AssembleCommand(this,
+															getString(ctx, TAG_ARGUMENT),
+															(double) getInteger(ctx, "gap"), DEFAULT_TIME).run(ctx))
+													.then(argument("time", integer())
+															.executes((ctx) -> new AssembleCommand(this,
+																	getString(ctx, TAG_ARGUMENT),
+																	(double) getInteger(ctx, "gap"),
+																	getInteger(ctx, "time")).run(ctx))))
+											.executes((ctx) -> new AssembleCommand(this, getString(ctx, TAG_ARGUMENT),
+													DEFAULT_GAP, DEFAULT_TIME).run(ctx))));
 		});
 	}
 
-	private void renderCube(final WorldRenderContext ctx, final BlockPos pos1, final BlockPos pos2, Color color) {
+	private void renderCube(final WorldRenderContext ctx, final BlockPos pos1, final BlockPos pos2, final Color color) {
 
 		if (pos1 == null || pos2 == null) {
 			return;
@@ -175,7 +185,7 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 
 		buffer.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-		final Vec3d[] vertices = new Vec3d[] { new Vec3d(sPos.getX(), sPos.getY(), sPos.getZ() + 1d),
+		final Vec3d[] vertices = { new Vec3d(sPos.getX(), sPos.getY(), sPos.getZ() + 1d),
 				new Vec3d(sPos.getX(), sPos.getY(), nPos.getZ()), new Vec3d(sPos.getX(), sPos.getY(), nPos.getZ()),
 				new Vec3d(nPos.getX() + 1d, sPos.getY(), nPos.getZ()),
 				new Vec3d(nPos.getX() + 1d, sPos.getY(), nPos.getZ()),
@@ -198,11 +208,11 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 				new Vec3d(nPos.getX() + 1d, sPos.getY(), nPos.getZ()),
 				new Vec3d(nPos.getX() + 1d, nPos.getY() + 1d, nPos.getZ()) };
 
-		for (final Vec3d v : vertices) {
+		for (final Vec3d vertex : vertices) {
 
-			final Vec3d cv = v.subtract(camera);
+			final Vec3d cameraVertex = vertex.subtract(camera);
 
-			buffer.vertex(cv.getX(), cv.getY(), cv.getZ())
+			buffer.vertex(cameraVertex.getX(), cameraVertex.getY(), cameraVertex.getZ())
 					.color(color.red(), color.green(), color.blue(), color.alpha()).next();
 		}
 
@@ -243,15 +253,15 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 
 		switch (position) {
 		case SOURCE_POS1:
-			return sourcePos1;
+			return sourcePos1; // NOPMD by heiko on 02.10.22, 02:16
 		case SOURCE_POS2:
-			return sourcePos2;
+			return sourcePos2; // NOPMD by heiko on 02.10.22, 02:16
 		case TARGET_POS1:
-			return targetPos1;
+			return targetPos1; // NOPMD by heiko on 02.10.22, 02:16
 		case TARGET_POS2:
-			return targetPos2;
+			return targetPos2; // NOPMD by heiko on 02.10.22, 02:16
 		case RESULT_POS1:
-			return resultPos1;
+			return resultPos1; // NOPMD by heiko on 02.10.22, 02:16
 		case RESULT_POS2:
 			return resultPos2;
 		default:

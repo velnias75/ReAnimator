@@ -49,7 +49,7 @@ public final class PosCommand extends AbstractReAnimatorContextCommand {
 	@Override
 	public int run(final CommandContext<FabricClientCommandSource> ctx) throws CommandSyntaxException {
 
-		final MinecraftClient client = ctx.getSource().getClient();
+		final MinecraftClient client = ctx.getSource().getClient(); // NOPMD by heiko on 02.10.22, 01:52
 		final HitResult hit = client.crosshairTarget;
 
 		BlockPos blockPos = null;
@@ -90,9 +90,9 @@ public final class PosCommand extends AbstractReAnimatorContextCommand {
 
 		switch (position) {
 		case SOURCE_POS1:
-			return "source position 1";
+			return "source position 1"; // NOPMD by heiko on 02.10.22, 01:52
 		case SOURCE_POS2:
-			return "source position 2";
+			return "source position 2"; // NOPMD by heiko on 02.10.22, 01:52
 		case TARGET_POS1:
 		case TARGET_POS2:
 			return "target position";

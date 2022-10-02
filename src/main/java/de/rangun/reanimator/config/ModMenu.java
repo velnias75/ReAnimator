@@ -21,6 +21,6 @@ package de.rangun.reanimator.config;
 
 import com.terraformersmc.modmenu.api.ModMenuApi;
 
-public final class ModMenu implements ModMenuApi {
+public final class ModMenu implements ModMenuApi { // NOPMD by heiko on 02.10.22, 01:50
 
 }

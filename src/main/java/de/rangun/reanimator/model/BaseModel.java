@@ -43,11 +43,11 @@ class BaseModel<T extends Object> {
 		this.modelData = (T[][][]) new Object[dim.getX()][dim.getY()][dim.getZ()];
 	}
 
-	public T get(int x, int y, int z) {
+	public final T get(final int x, final int y, final int z) { // NOPMD by heiko on 02.10.22, 01:49
 		return modelData[x][y][z];
 	}
 
-	public void set(final BlockPos pos, final T state) {
+	public final void set(final BlockPos pos, final T state) {
 		modelData[pos.getX() + offX][pos.getY() + offY][pos.getZ() + offZ] = state;
 	}
 

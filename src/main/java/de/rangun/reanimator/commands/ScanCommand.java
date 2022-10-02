@@ -47,9 +47,9 @@ public final class ScanCommand extends AbstractReAnimatorContextCommand {
 		final BlockPos sPos1 = context().getPosition(Position.SOURCE_POS1);
 		final BlockPos sPos2 = context().getPosition(Position.SOURCE_POS2);
 
-		if (!(sPos1 == null || sPos2 == null)) {
+		if (!(sPos1 == null || sPos2 == null)) { // NOPMD by heiko on 02.10.22, 01:51
 
-			final World world = ctx.getSource().getWorld();
+			final World world = ctx.getSource().getWorld(); // NOPMD by heiko on 02.10.22, 01:51
 			final SourceModel model = new SourceModel(sPos1, sPos2);
 
 			final long blockCnt = Utils.traverseArea(sPos1, sPos2, (pos) -> {
