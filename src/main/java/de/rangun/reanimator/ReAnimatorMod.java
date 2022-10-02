@@ -49,7 +49,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 @Environment(EnvType.CLIENT)
-public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext {
+public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorContext { // NO_UCD (unused code)
 
 	private final static String TAG_ARGUMENT = "tag";
 

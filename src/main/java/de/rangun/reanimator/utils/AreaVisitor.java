@@ -22,7 +22,7 @@ package de.rangun.reanimator.utils;
 import net.minecraft.util.math.BlockPos;
 
 @FunctionalInterface
-public interface AreaVisitor {
+public interface AreaVisitor { // NO_UCD (use default)
 
 	boolean visit(BlockPos pos);
 

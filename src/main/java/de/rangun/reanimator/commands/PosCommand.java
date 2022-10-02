@@ -54,33 +54,36 @@ public final class PosCommand extends AbstractReAnimatorContextCommand {
 
 		BlockPos blockPos = null;
 
-		switch (hit.getType()) {
-		case MISS:
-			break;
-		case ENTITY:
-			blockPos = new BlockPos(((EntityHitResult) hit).getPos());
-			break;
-		case BLOCK:
-			blockPos = ((BlockHitResult) hit).getBlockPos();
-			break;
-		}
+		if (hit != null) {
 
-		if (blockPos != null) {
-
-			context().setPosition(position, blockPos);
-			ctx.getSource().sendFeedback(Text.literal(
-					positionText() + " set to " + blockPos.getX() + ", " + blockPos.getY() + ", " + blockPos.getZ()));
-
-			if (position == Position.TARGET_POS1 && (context().getPosition(Position.SOURCE_POS1) == null
-					|| context().getPosition(Position.SOURCE_POS2) == null)) {
-				ctx.getSource()
-						.sendFeedback(Text.empty()
-								.append(Text.literal("please make a source selection with /spos1 and /spos2"))
-								.formatted(Formatting.ITALIC));
+			switch (hit.getType()) {
+			case MISS:
+				break;
+			case ENTITY:
+				blockPos = new BlockPos(((EntityHitResult) hit).getPos());
+				break;
+			case BLOCK:
+				blockPos = ((BlockHitResult) hit).getBlockPos();
+				break;
 			}
 
-		} else {
-			ctx.getSource().sendError(Text.literal("Could not determine any block at crosshair position"));
+			if (blockPos != null) {
+
+				context().setPosition(position, blockPos);
+				ctx.getSource().sendFeedback(Text.literal(positionText() + " set to " + blockPos.getX() + ", "
+						+ blockPos.getY() + ", " + blockPos.getZ()));
+
+				if (position == Position.TARGET_POS1 && (context().getPosition(Position.SOURCE_POS1) == null
+						|| context().getPosition(Position.SOURCE_POS2) == null)) {
+					ctx.getSource()
+							.sendFeedback(Text.empty()
+									.append(Text.literal("please make a source selection with /spos1 and /spos2"))
+									.formatted(Formatting.ITALIC));
+				}
+
+			} else {
+				ctx.getSource().sendError(Text.literal("Could not determine any block at crosshair position"));
+			}
 		}
 
 		return Command.SINGLE_SUCCESS;

@@ -25,10 +25,10 @@ import net.minecraft.util.math.Vec3i;
 
 class BaseModel<T extends Object> {
 
-	protected final T modelData[][][];
-	protected final int offX;
-	protected final int offY;
-	protected final int offZ;
+	private final T modelData[][][];
+	private final int offX;
+	private final int offY;
+	private final int offZ;
 
 	@SuppressWarnings("unchecked")
 	protected BaseModel(final BlockPos pos1, final BlockPos pos2) {
