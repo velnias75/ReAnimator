@@ -178,7 +178,8 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		}
 
 		final Vec3d nPos = Utils.nPos(pos1, pos2);
-		final Vec3d sPos = !isTarget ? Utils.sPos(pos1, pos2) : Utils.tPos(pos1, pos2);
+		final Vec3d sPos = !isTarget ? Utils.sPos(pos1, pos2) : Utils.tPos(pos1, pos2); // NOPMD by heiko on 03.10.22,
+																						// 13:35
 		final Vec3d camera = ctx.camera().getPos();
 
 		final Tessellator tessellator = Tessellator.getInstance();

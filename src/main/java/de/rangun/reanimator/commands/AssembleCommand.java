@@ -48,6 +48,8 @@ import net.minecraft.util.registry.Registry;
 @Environment(EnvType.CLIENT)
 public final class AssembleCommand extends AbstractReAnimatorContextCommand { // NOPMD by heiko on 02.10.22, 01:55
 
+	private final static String SETBLOCK_CMD = "setblock ";
+
 	private final String tag;
 	private final double gap;
 	private final int time;
@@ -93,11 +95,11 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand { //
 
 					final BlockPos worldPos = nPos.add(modelPos);
 
-					final StringBuilder air = new StringBuilder(256).append("setblock ").append(worldPos.getX())
+					final StringBuilder air = new StringBuilder(256).append(SETBLOCK_CMD).append(worldPos.getX())
 							.append(' ').append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
 							.append(Registry.BLOCK.getId(Blocks.AIR).toString()).append(" replace");
 
-					final StringBuilder command = new StringBuilder(256).append("setblock ").append(worldPos.getX())
+					final StringBuilder command = new StringBuilder(256).append(SETBLOCK_CMD).append(worldPos.getX())
 							.append(' ').append(worldPos.getY()).append(' ').append(worldPos.getZ()).append(' ')
 							.append(Registry.BLOCK.getId(Blocks.CHAIN_COMMAND_BLOCK).toString())
 							.append("[conditional=false,facing=").append(doFacingLayout(modelPos, dim))
@@ -122,14 +124,14 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand { //
 
 				final BlockPos triggerPos = nPos.add(0, 0, dim.getZ() + 1);
 
-				player.sendCommand("setblock " + triggerPos.getX() + " " + triggerPos.getY() + " " + triggerPos.getZ()
+				player.sendCommand(SETBLOCK_CMD + triggerPos.getX() + " " + triggerPos.getY() + " " + triggerPos.getZ()
 						+ " " + Registry.BLOCK.getId(Blocks.AIR).toString() + " replace");
-				player.sendCommand("setblock " + triggerPos.getX() + " " + triggerPos.getY() + " " + triggerPos.getZ()
+				player.sendCommand(SETBLOCK_CMD + triggerPos.getX() + " " + triggerPos.getY() + " " + triggerPos.getZ()
 						+ " " + Registry.BLOCK.getId(Blocks.COMMAND_BLOCK).toString()
 						+ "[conditional=false,facing=north]{Command:\"kill @e[tag=" + tag
 						+ "]\",powered:0b,auto:0b,conditionMet:0b,CustomName:\'{\"text\":\"" + modName + " by "
 						+ modAuthors + "\"}\'} replace");
-				player.sendCommand("setblock " + triggerPos.getX() + " " + (triggerPos.getY() + 1) + " "
+				player.sendCommand(SETBLOCK_CMD + triggerPos.getX() + " " + (triggerPos.getY() + 1) + " "
 						+ triggerPos.getZ() + " " + Registry.BLOCK.getId(Blocks.STONE_BUTTON).toString()
 						+ "[face=floor,facing=north] replace");
 
@@ -190,8 +192,8 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand { //
 	}
 
 	private String createSummonCommand(final BlockState state, final Vec3i dim) {
-		return new StringBuilder(4096)
-				.append("summon " + Registry.ENTITY_TYPE.getId(EntityType.ARMOR_STAND).toString() + " ~ ~")
+		return new StringBuilder(4096).append("summon ")
+				.append(Registry.ENTITY_TYPE.getId(EntityType.ARMOR_STAND).toString()).append(" ~ ~")
 				.append(gap + dim.getY())
 				.append(" ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,NoBasePlate:1b,PersistenceRequired:0b,Tags:[\"")
 				.append(tag).append("\"],Passengers:[{id:\"")
