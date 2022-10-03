@@ -53,6 +53,12 @@ public final class Utils {
 		return blockCnt;
 	}
 
+	public static Vec3i dimension(final BlockPos pos1, final BlockPos pos2) {
+		return new Vec3i(Math.max(pos1.getX(), pos2.getX()) - Math.min(pos1.getX(), pos2.getX()),
+				Math.max(pos1.getY(), pos2.getY()) - Math.min(pos1.getY(), pos2.getY()),
+				Math.max(pos1.getZ(), pos2.getZ()) - Math.min(pos1.getZ(), pos2.getZ()));
+	}
+
 	public static Vec3d nPos(final BlockPos pos1, final BlockPos pos2) {
 		return new Vec3d(Math.min(pos1.getX(), pos2.getX()) - 1d, Math.min(pos1.getY(), pos2.getY()) - 1d,
 				Math.min(pos1.getZ(), pos2.getZ()));
@@ -63,9 +69,12 @@ public final class Utils {
 				Math.max(pos1.getZ(), pos2.getZ()));
 	}
 
-	public static Vec3i dimension(final BlockPos pos1, final BlockPos pos2) {
-		return new Vec3i(Math.max(pos1.getX(), pos2.getX()) - Math.min(pos1.getX(), pos2.getX()),
-				Math.max(pos1.getY(), pos2.getY()) - Math.min(pos1.getY(), pos2.getY()),
-				Math.max(pos1.getZ(), pos2.getZ()) - Math.min(pos1.getZ(), pos2.getZ()));
+	public static Vec3d tPos(final BlockPos pos1, final BlockPos pos2) {
+
+		final Vec3d nPos = Utils.nPos(pos1, pos2);
+		final Vec3d sPos = Utils.sPos(pos1, pos2).add(0d, 0d, 1d);
+
+		return dimension(new BlockPos(nPos), new BlockPos(sPos)).getY() == 2 ? sPos.add(0d, 1d, 0d) : sPos;
 	}
+
 }

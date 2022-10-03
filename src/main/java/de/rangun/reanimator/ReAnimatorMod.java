@@ -110,9 +110,9 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 
 			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-			renderCube(ctx, sourcePos1, sourcePos2, Color.RED);
-			renderCube(ctx, targetPos1, targetPos2, Color.BLUE);
-			renderCube(ctx, resultPos1, resultPos2, Color.YELLOW);
+			renderCube(ctx, sourcePos1, sourcePos2, Color.RED, false);
+			renderCube(ctx, targetPos1, targetPos2, Color.BLUE, true);
+			renderCube(ctx, resultPos1, resultPos2, Color.YELLOW, false);
 
 			RenderSystem.enableBlend();
 			RenderSystem.enableTexture();
@@ -170,14 +170,15 @@ public final class ReAnimatorMod implements ClientModInitializer, ReAnimatorCont
 		});
 	}
 
-	private void renderCube(final WorldRenderContext ctx, final BlockPos pos1, final BlockPos pos2, final Color color) {
+	private void renderCube(final WorldRenderContext ctx, final BlockPos pos1, final BlockPos pos2, final Color color,
+			final boolean isTarget) {
 
 		if (pos1 == null || pos2 == null) {
 			return;
 		}
 
 		final Vec3d nPos = Utils.nPos(pos1, pos2);
-		final Vec3d sPos = Utils.sPos(pos1, pos2);
+		final Vec3d sPos = !isTarget ? Utils.sPos(pos1, pos2) : Utils.tPos(pos1, pos2);
 		final Vec3d camera = ctx.camera().getPos();
 
 		final Tessellator tessellator = Tessellator.getInstance();
