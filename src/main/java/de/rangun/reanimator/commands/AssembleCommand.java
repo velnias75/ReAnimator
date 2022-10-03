@@ -38,6 +38,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.CommandBlockBlockEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.network.packet.c2s.play.UpdateCommandBlockC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -119,6 +120,19 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand { //
 					return false;
 				});
 
+				final BlockPos triggerPos = nPos.add(0, 0, dim.getZ() + 1);
+
+				player.sendCommand("setblock " + triggerPos.getX() + " " + triggerPos.getY() + " " + triggerPos.getZ()
+						+ " " + Registry.BLOCK.getId(Blocks.AIR).toString() + " replace");
+				player.sendCommand("setblock " + triggerPos.getX() + " " + triggerPos.getY() + " " + triggerPos.getZ()
+						+ " " + Registry.BLOCK.getId(Blocks.COMMAND_BLOCK).toString()
+						+ "[conditional=false,facing=north]{Command:\"kill @e[tag=" + tag
+						+ "]\",powered:0b,auto:0b,conditionMet:0b,CustomName:\'{\"text\":\"" + modName + " by "
+						+ modAuthors + "\"}\'} replace");
+				player.sendCommand("setblock " + triggerPos.getX() + " " + (triggerPos.getY() + 1) + " "
+						+ triggerPos.getZ() + " " + Registry.BLOCK.getId(Blocks.STONE_BUTTON).toString()
+						+ "[face=floor,facing=north] replace");
+
 			} else if (model == null) {
 				ctx.getSource().sendError(Text.literal("please scan a model first with /scan"));
 			} else if (targetPos1 == null) {
@@ -176,9 +190,12 @@ public final class AssembleCommand extends AbstractReAnimatorContextCommand { //
 	}
 
 	private String createSummonCommand(final BlockState state, final Vec3i dim) {
-		return new StringBuilder(4096).append("summon armor_stand ~ ~").append(gap + dim.getY()).append(
-				" ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,NoBasePlate:1b,PersistenceRequired:0b,Tags:[\"")
-				.append(tag).append("\"],Passengers:[{id:\"minecraft:falling_block\",BlockState:")
+		return new StringBuilder(4096)
+				.append("summon " + Registry.ENTITY_TYPE.getId(EntityType.ARMOR_STAND).toString() + " ~ ~")
+				.append(gap + dim.getY())
+				.append(" ~ {CustomNameVisible:0b,NoGravity:1b,Silent:1b,Invulnerable:1b,HasVisualFire:0b,Glowing:1b,ShowArms:0b,Small:1b,Marker:1b,Invisible:1b,NoBasePlate:1b,PersistenceRequired:0b,Tags:[\"")
+				.append(tag).append("\"],Passengers:[{id:\"")
+				.append(Registry.ENTITY_TYPE.getId(EntityType.FALLING_BLOCK).toString()).append("\",BlockState:")
 				.append(BlockState.CODEC.encodeStart(JsonOps.INSTANCE, state).result().get())
 				.append(",NoGravity:1b,Silent:1b,HasVisualFire:0b,Glowing:0b,Time:").append(time)
 				.append(",DropItem:0b,HurtEntities:0b,Tags:[\"").append(tag).append("\"]}],Rotation:[-180F,0F]}")
