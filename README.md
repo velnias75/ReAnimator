@@ -32,8 +32,10 @@ Syntax: `/assemble <tag> [gap] [time]`
 - **time**: the time in ticks before the *falling blocks* actually will really fall down (default: -2147483648, optional)
 
 ## Important
-This *mod* is in very early development.<br />
-So **don't use it on productive worlds**, but generate a test world.<br />
+> __Warning__
+> This *mod* is in very early development.<br />
+> So **don't use it on productive worlds**, but generate a test world.<br />
+
 If you want to **support** the development, join my [Discord](https://discord.gg/tkX9BcwCCS) and/or use the [Issues](https://github.com/velnias75/ReAnimator/issues).
 
 # Video
